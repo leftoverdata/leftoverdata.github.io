@@ -4,17 +4,17 @@ project:
 
 website:
   title: "LeftOver Data"
-  site-url: https://www.leftoverdata.com
-  description: "Pushin it up."
+  site-url: https://leftoverdata.com
+  description: "A placeholder for a blog about data science and analytics."
   navbar:
     right:
       - about.qmd
       - icon: rss
         href: index.xml
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/leftoverdata/leftoverdata.github.io
+      - icon: chat-left-text
+        href: https://bsky.app/profile/dancranford.bsky.social
 format:
   html:
     theme:

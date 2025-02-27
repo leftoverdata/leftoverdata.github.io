@@ -1,13 +1,27 @@
 ---
 title: "Left Over Data"
+
 listing:
-  contents: posts
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
-  feed: true
+  - id: posts
+    contents: posts
+    sort: "date desc"
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    feed: true
+    type: grid
+    grid-columns: 3
+
+  - id: authors
+    contents: author-pages
+    sort: "date desc"
+    categories: true
+    sort-ui: false
+    filter-ui: false
+    feed: true
+    type: grid
+    grid-columns: 3
+
 page-layout: full
 title-block-banner: true
 ---

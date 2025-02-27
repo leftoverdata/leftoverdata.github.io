@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.leftoverdata.com/posts/welcome/index.html</loc>
-    <lastmod>2025-02-18T02:57:27.280Z</lastmod>
+    <loc>https://leftoverdata.com/posts/welcome/index.html</loc>
+    <lastmod>2025-02-25T13:35:46.906Z</lastmod>
   </url>
   <url>
-    <loc>https://www.leftoverdata.com/index.html</loc>
-    <lastmod>2025-02-18T03:09:58.541Z</lastmod>
+    <loc>https://leftoverdata.com/index.html</loc>
+    <lastmod>2025-02-27T11:46:45.338Z</lastmod>
   </url>
   <url>
-    <loc>https://www.leftoverdata.com/about.html</loc>
-    <lastmod>2025-02-18T02:57:27.333Z</lastmod>
+    <loc>https://leftoverdata.com/about.html</loc>
+    <lastmod>2025-02-25T13:35:46.849Z</lastmod>
   </url>
   <url>
-    <loc>https://www.leftoverdata.com/posts/post-with-code/index.html</loc>
-    <lastmod>2025-02-18T02:57:27.317Z</lastmod>
+    <loc>https://leftoverdata.com/author-pages/dave-crawford/index.html</loc>
+    <lastmod>2025-02-27T11:48:54.973Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leftoverdata.com/posts/post-with-code/index.html</loc>
+    <lastmod>2025-02-27T11:59:11.622Z</lastmod>
   </url>
 </urlset>

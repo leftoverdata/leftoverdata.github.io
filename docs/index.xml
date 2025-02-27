@@ -6,15 +6,15 @@
       version="2.0">
 <channel>
 <title>LeftOver Data</title>
-<link>https://www.leftoverdata.com/</link>
-<atom:link href="https://www.leftoverdata.com/index.xml" rel="self" type="application/rss+xml"/>
-<description>Pushin it up.</description>
-<generator>quarto-1.6.40</generator>
-<lastBuildDate>Mon, 17 Feb 2025 08:00:00 GMT</lastBuildDate>
+<link>https://leftoverdata.com/</link>
+<atom:link href="https://leftoverdata.com/index.xml" rel="self" type="application/rss+xml"/>
+<description>A placeholder for a blog about data science and analytics.</description>
+<generator>quarto-1.4.540</generator>
+<lastBuildDate>Thu, 27 Feb 2025 08:00:00 GMT</lastBuildDate>
 <item>
   <title>Post With Code</title>
-  <dc:creator>Harlow Malloc</dc:creator>
-  <link>https://www.leftoverdata.com/posts/post-with-code/</link>
+  <dc:creator>Dave Crawford</dc:creator>
+  <link>https://leftoverdata.com/posts/post-with-code/</link>
   <description><![CDATA[ 
 
 
@@ -22,21 +22,40 @@
 
 
 <p>This is a post with executable code.</p>
+<div id="a44fd993" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> arcgis</span>
+<span id="cb1-2">gis <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> arcgis.GIS()</span>
+<span id="cb1-3">m <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> gis.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">map</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'San Francisco, CA'</span>)</span>
+<span id="cb1-4">m</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"cb3b90ac5f494395956f0a453ba8d277","version_major":2,"version_minor":1,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+</div>
 
 
 
  ]]></description>
-  <category>news</category>
-  <category>code</category>
-  <category>analysis</category>
-  <guid>https://www.leftoverdata.com/posts/post-with-code/</guid>
-  <pubDate>Mon, 17 Feb 2025 08:00:00 GMT</pubDate>
-  <media:content url="https://www.leftoverdata.com/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
+  <category>gis</category>
+  <guid>https://leftoverdata.com/posts/post-with-code/</guid>
+  <pubDate>Thu, 27 Feb 2025 08:00:00 GMT</pubDate>
+  <media:content url="https://leftoverdata.com/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Welcome To My Blog</title>
   <dc:creator>Tristan O&#39;Malley</dc:creator>
-  <link>https://www.leftoverdata.com/posts/welcome/</link>
+  <link>https://leftoverdata.com/posts/welcome/</link>
   <description><![CDATA[ 
 
 
@@ -44,15 +63,34 @@
 
 
 <p>This is the first post in a Quarto blog. Welcome!</p>
-<p><img src="https://www.leftoverdata.com/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
+<p><img src="https://leftoverdata.com/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
 <p>Since this post doesn’t specify an explicit <code>image</code>, the first image in the post will be used in the listing page of posts.</p>
 
 
 
  ]]></description>
   <category>news</category>
-  <guid>https://www.leftoverdata.com/posts/welcome/</guid>
+  <guid>https://leftoverdata.com/posts/welcome/</guid>
   <pubDate>Fri, 14 Feb 2025 08:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Dave Crawford</title>
+  <link>https://leftoverdata.com/author-pages/dave-crawford/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Dave Crawford is a husband, worker, analyst, author, and traveller. In that order.</p>
+<p><img src="https://leftoverdata.com/author-pages/dave-crawford/dave_raccoon.jpeg" class="img-fluid"></p>
+<p>Additonal text here.</p>
+
+
+
+ ]]></description>
+  <guid>https://leftoverdata.com/author-pages/dave-crawford/</guid>
+  <pubDate>Thu, 27 Feb 2025 12:01:21 GMT</pubDate>
 </item>
 </channel>
 </rss>

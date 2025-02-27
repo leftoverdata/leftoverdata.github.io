@@ -11,7 +11,7 @@
     "href": "index.html",
     "title": "Left Over Data",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nFeb 17, 2025\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nFeb 14, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "Post With Code\n\n\n\ngis\n\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\nTristan O’Malley\n\n\nFeb 14, 2025\n\n\n\n\n\n\n\n\nNo matching items\n\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -21,10 +21,17 @@
     "text": "About this blog"
   },
   {
+    "objectID": "author-pages/dave-crawford/index.html",
+    "href": "author-pages/dave-crawford/index.html",
+    "title": "Dave Crawford",
+    "section": "",
+    "text": "Dave Crawford is a husband, worker, analyst, author, and traveller. In that order.\n\nAdditonal text here."
+  },
+  {
     "objectID": "posts/post-with-code/index.html",
     "href": "posts/post-with-code/index.html",
     "title": "Post With Code",
     "section": "",
-    "text": "This is a post with executable code."
+    "text": "This is a post with executable code.\n\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
   }
 ]

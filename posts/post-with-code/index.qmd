@@ -1,9 +1,16 @@
 ---
 title: "Post With Code"
-author: "Harlow Malloc"
-date: "2025-02-17"
-categories: [news, code, analysis]
+author: "Dave Crawford"
+date: "2025-02-27"
+categories: [gis]
 image: "image.jpg"
 ---
 
 This is a post with executable code.
+
+```{python}
+import arcgis
+gis = arcgis.GIS()
+m = gis.map('San Francisco, CA')
+m
+```
