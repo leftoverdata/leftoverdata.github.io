@@ -7,18 +7,11 @@
     "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Left Over Data",
+    "objectID": "posts/mls-data/index.html",
+    "href": "posts/mls-data/index.html",
+    "title": "Mass Layoff Statistic Data",
     "section": "",
-    "text": "Post With Code\n\n\n\ngis\n\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\nnews\n\n\n\n\n\n\n\nTristan O’Malley\n\n\nFeb 14, 2025\n\n\n\n\n\n\n\n\nNo matching items\n\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
+    "text": "The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.\nThis data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws."
   },
   {
     "objectID": "author-pages/dave-crawford/index.html",
@@ -28,10 +21,45 @@
     "text": "Dave Crawford is a husband, worker, analyst, author, and traveller. In that order.\n\nAdditonal text here."
   },
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Left Over Data",
+    "section": "",
+    "text": "Welcome to LeftOver Data. We’re dedicated to finding and analyzing obscure datasets to work toward real-world solutions."
+  },
+  {
+    "objectID": "index.html#posts",
+    "href": "index.html#posts",
+    "title": "Left Over Data",
+    "section": "Posts",
+    "text": "Posts\n\n\n\n\n\n\n\n\n\n\nMass Layoff Statistic Data\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nTristan O’Malley\n\n\nFeb 14, 2025\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html#authors",
+    "href": "index.html#authors",
+    "title": "Left Over Data",
+    "section": "Authors",
+    "text": "Authors\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "posts/post-with-code/index.html",
     "href": "posts/post-with-code/index.html",
     "title": "Post With Code",
     "section": "",
-    "text": "This is a post with executable code.\n\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
+    "text": "This is a post with executable code. This is some updated text.\nCode\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#now-add-a-layer",
+    "href": "posts/post-with-code/index.html#now-add-a-layer",
+    "title": "Post With Code",
+    "section": "Now add a layer",
+    "text": "Now add a layer\nNow we will add a layer of wildfires. This is available in the ArcGIS Living Atlas\n\n\nCode\nlyr = gis.content.get('d957997ccee7408287a963600a77f61f').layers[0]\nm.content.add(lyr)"
   }
 ]

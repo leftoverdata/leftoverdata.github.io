@@ -5,12 +5,34 @@
       xmlns:dc="http://purl.org/dc/elements/1.1/" 
       version="2.0">
 <channel>
-<title>LeftOver Data</title>
+<title>LOD</title>
 <link>https://leftoverdata.com/</link>
 <atom:link href="https://leftoverdata.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>A placeholder for a blog about data science and analytics.</description>
 <generator>quarto-1.4.540</generator>
 <lastBuildDate>Thu, 27 Feb 2025 08:00:00 GMT</lastBuildDate>
+<item>
+  <title>Mass Layoff Statistic Data</title>
+  <dc:creator>Dave Crawford</dc:creator>
+  <link>https://leftoverdata.com/posts/mls-data/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.</p>
+<p>This data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws.</p>
+
+
+
+ ]]></description>
+  <category>GIS</category>
+  <category>Public Data</category>
+  <guid>https://leftoverdata.com/posts/mls-data/</guid>
+  <pubDate>Thu, 27 Feb 2025 08:00:00 GMT</pubDate>
+  <media:content url="https://leftoverdata.com/posts/mls-data/image.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Post With Code</title>
   <dc:creator>Dave Crawford</dc:creator>
@@ -21,8 +43,10 @@
 
 
 
-<p>This is a post with executable code.</p>
-<div id="a44fd993" class="cell" data-execution_count="1">
+<p>This is a post with executable code. This is some updated text.</p>
+<div id="fee670f8" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> arcgis</span>
@@ -37,14 +61,32 @@ font-style: inherit;">map</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'San Francisco, CA'</span>)</span>
 <span id="cb1-4">m</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+</details>
+<div class="cell-output cell-output-display" data-execution_count="1">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"cb3b90ac5f494395956f0a453ba8d277","version_major":2,"version_minor":1,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"f9806ce3b5484219967c597a38f0cdff","version_major":2,"version_minor":1,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
+<section id="now-add-a-layer" class="level2">
+<h2 class="anchored" data-anchor-id="now-add-a-layer">Now add a layer</h2>
+<p>Now we will add a layer of wildfires. This is available in the <a href="https://livingatlas.arcgis.com/en/browse/#d=2">ArcGIS Living Atlas</a></p>
+<div id="0c441081" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">lyr <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> gis.content.get(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'d957997ccee7408287a963600a77f61f'</span>).layers[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>]</span>
+<span id="cb2-2">m.content.add(lyr)</span></code></pre></div>
+</details>
+</div>
 
 
+</section>
 
  ]]></description>
   <category>gis</category>
@@ -90,7 +132,7 @@ font-style: inherit;">'San Francisco, CA'</span>)</span>
 
  ]]></description>
   <guid>https://leftoverdata.com/author-pages/dave-crawford/</guid>
-  <pubDate>Thu, 27 Feb 2025 12:01:21 GMT</pubDate>
+  <pubDate>Fri, 28 Feb 2025 00:19:38 GMT</pubDate>
 </item>
 </channel>
 </rss>
