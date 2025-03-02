@@ -9,10 +9,10 @@
 <link>https://leftoverdata.com/</link>
 <atom:link href="https://leftoverdata.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>A placeholder for a blog about data science and analytics.</description>
-<generator>quarto-1.4.540</generator>
-<lastBuildDate>Thu, 27 Feb 2025 08:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Sun, 02 Mar 2025 08:00:00 GMT</lastBuildDate>
 <item>
-  <title>Mass Layoff Statistic Data</title>
+  <title>Mass Layoff Statistics Data</title>
   <dc:creator>Dave Crawford</dc:creator>
   <link>https://leftoverdata.com/posts/mls-data/</link>
   <description><![CDATA[ 
@@ -27,11 +27,366 @@
 
 
  ]]></description>
-  <category>GIS</category>
-  <category>Public Data</category>
+  <category>Labor Statistics</category>
   <guid>https://leftoverdata.com/posts/mls-data/</guid>
-  <pubDate>Thu, 27 Feb 2025 08:00:00 GMT</pubDate>
-  <media:content url="https://leftoverdata.com/posts/mls-data/image.jpg" medium="image" type="image/jpeg"/>
+  <pubDate>Sun, 02 Mar 2025 08:00:00 GMT</pubDate>
+  <media:content url="https://leftoverdata.com/posts/mls-data/BLS.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Importing Mass Layoff Statistics Data</title>
+  <dc:creator>Dave Crawford</dc:creator>
+  <link>https://leftoverdata.com/posts/mls-data-import/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This post is part of a series about Mass Layoff Statistics data collected by the Bureau of Labor Statistics. Check out the main post <a href="../../posts/mls-data/index.html">here</a></p>
+<p>Working with obscure federal government data can be tricky. There are always plenty of gotchas. This Mass Layoff Statistics data is certainly no exception. It’s downloadable as a series of tab-delimited text files. As you’ll see later, some of the tables have column names and some don’t. Luckily there’s some documentation included in the data release.</p>
+<section id="downloading-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-the-data">Downloading the data</h2>
+<p>The final data from this program resides at <a href="https://download.bls.gov/pub/time.series/ml/">this url</a>. At the time of writing, this data cannot be downloaded programmatically. This means that the BLS has some sort of protection against referencing the tables where they exist. For this reason, I downloaded each text file manually and put them in a folder. I’ve included a zip file <a href="raw_mls.zip">here</a> in case the original data source goes away for any reason.</p>
+</section>
+<section id="reading-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="reading-the-data">Reading the data</h2>
+<p>This data is heavily normalized and designed to be used in a database. There are a bunch of coded columns and lookup tables. This is pretty typical with this kind of data. It was produced at a time when every kilobyte of data mattered for storage cost purposes. It does add a bit of complexity to reading the data though.</p>
+<p>For the task of reading and storing this data, I’ve decided to use <a href="https://duckdb.org/">DuckDB</a>. DuckDB is excellent at reading csvs and other structured text files. It actually can read them in place without importing them to a database, which is super powerful.</p>
+<p>Let’s start by importing DuckDB and connecting to a database.</p>
+<div id="7096ead7" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> duckdb</span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># connect to a local DuckDB database.</span></span>
+<span id="cb1-4">quack <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> duckdb.<span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">connect</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mls.db"</span>)</span></code></pre></div>
+</div>
+<p>Now let’s get an inventory of the csv files.</p>
+<div id="73cb7e95" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> os</span>
+<span id="cb2-2"></span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># folder containing the MLS text files</span></span>
+<span id="cb2-4">folder <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"./raw_mls"</span></span>
+<span id="cb2-5"></span>
+<span id="cb2-6">all_text_files <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.listdir(folder)</span></code></pre></div>
+</div>
+<p>Now we can iterate through each of the text files and use DuckDB to read the data.</p>
+<div id="1ac5467e" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> text_file <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> all_text_files:</span>
+<span id="cb3-2">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(text_file)</span>
+<span id="cb3-3"></span>
+<span id="cb3-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create a full path for the text file</span></span>
+<span id="cb3-5">    text_file_path <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.path.join(folder, text_file)</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># format a sql statement to read from text file</span></span>
+<span id="cb3-8">    sql <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"""</span></span>
+<span id="cb3-9"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">        SELECT </span></span>
+<span id="cb3-10"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">            *</span></span>
+<span id="cb3-11"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">        FROM</span></span>
+<span id="cb3-12"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">            read_csv('</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>text_file_path<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">')</span></span>
+<span id="cb3-13"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb3-14"></span>
+<span id="cb3-15">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># execute the sql</span></span>
+<span id="cb3-16">    query_result <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> quack.sql(sql)</span>
+<span id="cb3-17"></span>
+<span id="cb3-18">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># print the column names that DuckDB found</span></span>
+<span id="cb3-19">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(query_result.columns)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ml.contacts
+['Mass Layoff Statistics Contacts']
+ml.data.0.Current
+['series_id', 'year', 'period', 'value', 'footnote_codes']
+ml.data.1.AllData
+['series_id', 'year', 'period', 'value', 'footnote_codes']
+ml.dataelement
+['003', 'Layoff events']
+ml.dataseries
+['M', 'Mass Layoff']
+ml.footnote
+['footnote_code', 'footnote_text']
+ml.industrybase
+['N', 'Industry data from 1995 to present (NAICS)']
+ml.irc
+['irc_code', 'irc_text', 'display_level', 'selectable', 'sort_sequence']
+ml.period
+['Q01', 'QTR1', '1st Quarter']
+ml.series
+['series_id', 'dataseries_code', 'srd_code', 'industryb_code', 'irc_code', 'dataelement_code', 'footnote_codes', 'begin_year', 'begin_period', 'end_year', 'end_period']
+ml.srd
+['column0', 'column1', 'column2', 'column3', 'column4']</code></pre>
+</div>
+</div>
+<p>The query result object from DuckDB has a lot of interesting properties. One that we can use is the <code>.columns</code> property. This will let us know if each table has a header or not.</p>
+</section>
+<section id="writing-to-a-database" class="level2">
+<h2 class="anchored" data-anchor-id="writing-to-a-database">Writing to a database</h2>
+<p>As you probably noticed, some of the text files don’t have column names or headers. You can see that duckdb read the first row and assumed it was the header. In this case, we’ll have to specify column names. We can create a dictionary of known column names based on the documentation that comes with the MLS data. Note that for the <em>srd</em> table, there are actually five columns but only two in the documentation.</p>
+<div id="282f17c4" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">table_columns <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {</span>
+<span id="cb5-2">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataelement"</span>: [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataelement_code"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataelement_text"</span>],</span>
+<span id="cb5-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataseries"</span>: [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataseries_code"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dataseries_text"</span>],</span>
+<span id="cb5-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"industrybase"</span>: [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"industrybase_code"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"industrybase_text"</span>],</span>
+<span id="cb5-5">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"period"</span>: [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"period"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"period_abbr"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"period_name"</span>],</span>
+<span id="cb5-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"srd"</span>: [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"srd_code"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"srd_text"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"col1"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"col2"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"col3"</span>]</span>
+<span id="cb5-7">}</span></code></pre></div>
+</div>
+<p>Now that we’ve created this dictionary with table names and columns, we can pass those columns into our sql statement where necessary. We’ll also modify the sql statement to create a table in our database instead of just querying the data.</p>
+<p>In the DuckDB <code>read_csv</code> function, we can use the following parameters: - <code>sample_size</code> - this is helpful for determining data types. The more rows that the function can sample, the more likely that it will guess the right data types for each column - <code>header</code> - This is true by default. That’s great for tables that have a header and column names. For the other tables that don’t, we’ll have to set this to False. - <code>names</code> - When the header is set to False, we can use this to provide column names.</p>
+<p>We’ll pass those parameters into the sql statement as a string.</p>
+<div id="7a8b9dae" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> text_file <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> all_text_files:</span>
+<span id="cb6-2">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(text_file)</span>
+<span id="cb6-3"></span>
+<span id="cb6-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create a full path for the text file</span></span>
+<span id="cb6-5">    text_file_path <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.path.join(folder, text_file)</span>
+<span id="cb6-6"></span>
+<span id="cb6-7">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># generate a table name based on the file name</span></span>
+<span id="cb6-8">    table_name <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> text_file.split(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'.'</span>)[<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb6-9"></span>
+<span id="cb6-10">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># use the table column dictionary</span></span>
+<span id="cb6-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> table_name <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> table_columns:</span>
+<span id="cb6-12">        params <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f", header=False, names=</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>table_columns[table_name]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span></span>
+<span id="cb6-13">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb6-14">        params <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span></span>
+<span id="cb6-15"></span>
+<span id="cb6-16">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># format the sql string</span></span>
+<span id="cb6-17">    sql <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">f"""</span></span>
+<span id="cb6-18"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">    CREATE OR REPLACE TABLE </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>table_name<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;"> AS</span></span>
+<span id="cb6-19"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">    SELECT</span></span>
+<span id="cb6-20"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">        *</span></span>
+<span id="cb6-21"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">    FROM</span></span>
+<span id="cb6-22"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">        read_csv('</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>text_file_path<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">', sample_size = 100_000_000 </span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span>params<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb6-23"></span>
+<span id="cb6-24"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">    """</span></span>
+<span id="cb6-25"></span>
+<span id="cb6-26">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># execute the sql statement</span></span>
+<span id="cb6-27">    query_results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> quack.sql(sql)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ml.contacts
+ml.data.0.Current</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"3bcbc2a10f804daf88a1e312934a2390","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ml.data.1.AllData</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"dc5f4b6121394d26bf81a39bf055a71e","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ml.dataelement
+ml.dataseries
+ml.footnote
+ml.industrybase
+ml.irc
+ml.period
+ml.series
+ml.srd</code></pre>
+</div>
+</div>
+<p>Now the data has been loaded into the DuckDB file and is ready for some analysis.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Labor Statistics</category>
+  <category>Implementation</category>
+  <guid>https://leftoverdata.com/posts/mls-data-import/</guid>
+  <pubDate>Sun, 02 Mar 2025 08:00:00 GMT</pubDate>
+  <media:content url="https://leftoverdata.com/posts/mls-data-import/duckdb.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Post With Code</title>
@@ -43,10 +398,8 @@
 
 
 
-<p>This is a post with executable code. This is some updated text.</p>
-<div id="fee670f8" class="cell" data-execution_count="1">
-<details class="code-fold">
-<summary>Code</summary>
+<p>This is a post with executable code.</p>
+<div id="a44fd993" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> arcgis</span>
@@ -61,59 +414,20 @@ font-style: inherit;">map</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'San Francisco, CA'</span>)</span>
 <span id="cb1-4">m</span></code></pre></div>
-</details>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"f9806ce3b5484219967c597a38f0cdff","version_major":2,"version_minor":1,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"cb3b90ac5f494395956f0a453ba8d277","version_major":2,"version_minor":1,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<section id="now-add-a-layer" class="level2">
-<h2 class="anchored" data-anchor-id="now-add-a-layer">Now add a layer</h2>
-<p>Now we will add a layer of wildfires. This is available in the <a href="https://livingatlas.arcgis.com/en/browse/#d=2">ArcGIS Living Atlas</a></p>
-<div id="0c441081" class="cell" data-execution_count="2">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">lyr <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> gis.content.get(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'d957997ccee7408287a963600a77f61f'</span>).layers[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>]</span>
-<span id="cb2-2">m.content.add(lyr)</span></code></pre></div>
-</details>
-</div>
 
 
-</section>
 
  ]]></description>
   <category>gis</category>
   <guid>https://leftoverdata.com/posts/post-with-code/</guid>
   <pubDate>Thu, 27 Feb 2025 08:00:00 GMT</pubDate>
   <media:content url="https://leftoverdata.com/posts/post-with-code/image.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Welcome To My Blog</title>
-  <dc:creator>Tristan O&#39;Malley</dc:creator>
-  <link>https://leftoverdata.com/posts/welcome/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>This is the first post in a Quarto blog. Welcome!</p>
-<p><img src="https://leftoverdata.com/posts/welcome/thumbnail.jpg" class="img-fluid"></p>
-<p>Since this post doesn’t specify an explicit <code>image</code>, the first image in the post will be used in the listing page of posts.</p>
-
-
-
- ]]></description>
-  <category>news</category>
-  <guid>https://leftoverdata.com/posts/welcome/</guid>
-  <pubDate>Fri, 14 Feb 2025 08:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Dave Crawford</title>
@@ -132,7 +446,7 @@ font-style: inherit;">0</span>]</span>
 
  ]]></description>
   <guid>https://leftoverdata.com/author-pages/dave-crawford/</guid>
-  <pubDate>Fri, 28 Feb 2025 00:19:38 GMT</pubDate>
+  <pubDate>Sun, 02 Mar 2025 20:21:24 GMT</pubDate>
 </item>
 </channel>
 </rss>

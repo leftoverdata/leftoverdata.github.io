@@ -3,12 +3,11 @@ project:
   output-dir: docs
 
 website:
-  title: "LeftOver Data"
+  title: "LOD"
   site-url: https://leftoverdata.com
   description: "A placeholder for a blog about data science and analytics."
   navbar:
     right:
-      - about.qmd
       - icon: rss
         href: index.xml
       - icon: github

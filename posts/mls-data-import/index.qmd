@@ -1,0 +1,122 @@
+---
+title: "Importing Mass Layoff Statistics Data"
+author: "Dave Crawford"
+date: "2025-03-02"
+categories: ["Labor Statistics", "Implementation"]
+image: "duckdb.jpg"
+---
+
+This post is part of a series about Mass Layoff Statistics data collected by the Bureau of Labor Statistics.  Check out the main post [here](../mls-data/index.qmd)
+
+Working with obscure federal government data can be tricky.  There are always plenty of gotchas.  This Mass Layoff Statistics data is certainly no exception.  It's downloadable as a series of tab-delimited text files.  As you'll see later, some of the tables have column names and some don't.  Luckily there's some documentation included in the data release.
+
+## Downloading the data
+The final data from this program resides at [this url](https://download.bls.gov/pub/time.series/ml/).  At the time of writing, this data cannot be downloaded programmatically.  This means that the BLS has some sort of protection against referencing the tables where they exist.  For this reason, I downloaded each text file manually and put them in a folder.  I've included a zip file [here](raw_mls.zip) in case the original data source goes away for any reason.
+
+## Reading the data
+This data is heavily normalized and designed to be used in a database.  There are a bunch of coded columns and lookup tables.  This is pretty typical with this kind of data.  It was produced at a time when every kilobyte of data mattered for storage cost purposes.  It does add a bit of complexity to reading the data though.
+
+For the task of reading and storing this data, I've decided to use [DuckDB](https://duckdb.org/). DuckDB is excellent at reading csvs and other structured text files.  It actually can read them in place without importing them to a database, which is super powerful.
+
+Let's start by importing DuckDB and connecting to a database.
+
+```{python}
+import duckdb
+
+# connect to a local DuckDB database.
+quack = duckdb.connect("mls.db")
+
+```
+
+Now let's get an inventory of the csv files.
+
+```{python}
+import os
+
+# folder containing the MLS text files
+folder = "./raw_mls"
+
+all_text_files = os.listdir(folder)
+```
+
+Now we can iterate through each of the text files and use DuckDB to read the data.
+
+```{python}
+for text_file in all_text_files:
+    print(text_file)
+
+    # create a full path for the text file
+    text_file_path = os.path.join(folder, text_file)
+
+    # format a sql statement to read from text file
+    sql = f"""
+        SELECT 
+            *
+        FROM
+            read_csv('{text_file_path}')
+    """
+
+    # execute the sql
+    query_result = quack.sql(sql)
+
+    # print the column names that DuckDB found
+    print(query_result.columns)
+```
+
+The query result object from DuckDB has a lot of interesting properties.  One that we can use is the `.columns` property.  This will let us know if each table has a header or not.
+
+## Writing to a database
+As you probably noticed, some of the text files don't have column names or headers.  You can see that duckdb read the first row and assumed it was the header.  In this case, we'll have to specify column names.  We can create a dictionary of known column names based on the documentation that comes with the MLS data.  Note that for the *srd* table, there are actually five columns but only two in the documentation.
+
+```{python}
+table_columns = {
+    "dataelement": ["dataelement_code", "dataelement_text"],
+    "dataseries": ["dataseries_code", "dataseries_text"],
+    "industrybase": ["industrybase_code", "industrybase_text"],
+    "period": ["period", "period_abbr", "period_name"],
+    "srd": ["srd_code", "srd_text", "col1", "col2", "col3"]
+}
+```
+
+Now that we've created this dictionary with table names and columns, we can pass those columns into our sql statement where necessary.  We'll also modify the sql statement to create a table in our database instead of just querying the data.
+
+In the DuckDB `read_csv` function, we can use the following parameters:
+- `sample_size` - this is helpful for determining data types.  The more rows that the function can sample, the more likely that it will guess the right data types for each column
+- `header` - This is true by default.  That's great for tables that have a header and column names.  For the other tables that don't, we'll have to set this to False.
+- `names` - When the header is set to False, we can use this to provide column names.
+
+We'll pass those parameters into the sql statement as a string.
+
+```{python}
+for text_file in all_text_files:
+    print(text_file)
+
+    # create a full path for the text file
+    text_file_path = os.path.join(folder, text_file)
+
+    # generate a table name based on the file name
+    table_name = text_file.split('.')[-1]
+
+    # use the table column dictionary
+    if table_name in table_columns:
+        params = f", header=False, names={table_columns[table_name]}"
+    else:
+        params = ""
+
+    # format the sql string
+    sql = f"""
+    CREATE OR REPLACE TABLE {table_name} AS
+    SELECT
+        *
+    FROM
+        read_csv('{text_file_path}', sample_size = 100_000_000 {params})
+
+    """
+
+    # execute the sql statement
+    query_results = quack.sql(sql)
+
+
+```
+
+Now the data has been loaded into the DuckDB file and is ready for some analysis.

@@ -26,4 +26,15 @@ page-layout: full
 title-block-banner: true
 ---
 
+Welcome to LeftOver Data. We’re dedicated to finding and analyzing obscure datasets to work toward real-world solutions.
 
+
+## Posts
+
+:::{#posts}
+:::
+
+## Authors
+
+:::{#authors}
+:::
