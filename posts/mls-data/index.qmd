@@ -1,0 +1,11 @@
+---
+title: "Mass Layoff Statistics Data"
+author: "Dave Crawford"
+date: "2025-03-02"
+categories: ["Labor Statistics"]
+image: "BLS.png"
+---
+
+The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.
+
+This data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws.

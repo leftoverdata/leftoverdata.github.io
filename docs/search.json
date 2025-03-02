@@ -1,31 +1,31 @@
 [
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "objectID": "posts/mls-data-import/index.html",
+    "href": "posts/mls-data-import/index.html",
+    "title": "Importing Mass Layoff Statistics Data",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "This post is part of a series about Mass Layoff Statistics data collected by the Bureau of Labor Statistics. Check out the main post here\nWorking with obscure federal government data can be tricky. There are always plenty of gotchas. This Mass Layoff Statistics data is certainly no exception. It’s downloadable as a series of tab-delimited text files. As you’ll see later, some of the tables have column names and some don’t. Luckily there’s some documentation included in the data release."
   },
   {
-    "objectID": "posts/mls-data/index.html",
-    "href": "posts/mls-data/index.html",
-    "title": "Mass Layoff Statistic Data",
-    "section": "",
-    "text": "The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.\nThis data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws."
+    "objectID": "posts/mls-data-import/index.html#downloading-the-data",
+    "href": "posts/mls-data-import/index.html#downloading-the-data",
+    "title": "Importing Mass Layoff Statistics Data",
+    "section": "Downloading the data",
+    "text": "Downloading the data\nThe final data from this program resides at this url. At the time of writing, this data cannot be downloaded programmatically. This means that the BLS has some sort of protection against referencing the tables where they exist. For this reason, I downloaded each text file manually and put them in a folder. I’ve included a zip file here in case the original data source goes away for any reason."
   },
   {
-    "objectID": "author-pages/dave-crawford/index.html",
-    "href": "author-pages/dave-crawford/index.html",
-    "title": "Dave Crawford",
-    "section": "",
-    "text": "Dave Crawford is a husband, worker, analyst, author, and traveller. In that order.\n\nAdditonal text here."
+    "objectID": "posts/mls-data-import/index.html#reading-the-data",
+    "href": "posts/mls-data-import/index.html#reading-the-data",
+    "title": "Importing Mass Layoff Statistics Data",
+    "section": "Reading the data",
+    "text": "Reading the data\nThis data is heavily normalized and designed to be used in a database. There are a bunch of coded columns and lookup tables. This is pretty typical with this kind of data. It was produced at a time when every kilobyte of data mattered for storage cost purposes. It does add a bit of complexity to reading the data though.\nFor the task of reading and storing this data, I’ve decided to use DuckDB. DuckDB is excellent at reading csvs and other structured text files. It actually can read them in place without importing them to a database, which is super powerful.\nLet’s start by importing DuckDB and connecting to a database.\n\nimport duckdb\n\n# connect to a local DuckDB database.\nquack = duckdb.connect(\"mls.db\")\n\nNow let’s get an inventory of the csv files.\n\nimport os\n\n# folder containing the MLS text files\nfolder = \"./raw_mls\"\n\nall_text_files = os.listdir(folder)\n\nNow we can iterate through each of the text files and use DuckDB to read the data.\n\nfor text_file in all_text_files:\n    print(text_file)\n\n    # create a full path for the text file\n    text_file_path = os.path.join(folder, text_file)\n\n    # format a sql statement to read from text file\n    sql = f\"\"\"\n        SELECT \n            *\n        FROM\n            read_csv('{text_file_path}')\n    \"\"\"\n\n    # execute the sql\n    query_result = quack.sql(sql)\n\n    # print the column names that DuckDB found\n    print(query_result.columns)\n\nml.contacts\n['Mass Layoff Statistics Contacts']\nml.data.0.Current\n['series_id', 'year', 'period', 'value', 'footnote_codes']\nml.data.1.AllData\n['series_id', 'year', 'period', 'value', 'footnote_codes']\nml.dataelement\n['003', 'Layoff events']\nml.dataseries\n['M', 'Mass Layoff']\nml.footnote\n['footnote_code', 'footnote_text']\nml.industrybase\n['N', 'Industry data from 1995 to present (NAICS)']\nml.irc\n['irc_code', 'irc_text', 'display_level', 'selectable', 'sort_sequence']\nml.period\n['Q01', 'QTR1', '1st Quarter']\nml.series\n['series_id', 'dataseries_code', 'srd_code', 'industryb_code', 'irc_code', 'dataelement_code', 'footnote_codes', 'begin_year', 'begin_period', 'end_year', 'end_period']\nml.srd\n['column0', 'column1', 'column2', 'column3', 'column4']\n\n\nThe query result object from DuckDB has a lot of interesting properties. One that we can use is the .columns property. This will let us know if each table has a header or not."
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this blog"
+    "objectID": "posts/mls-data-import/index.html#writing-to-a-database",
+    "href": "posts/mls-data-import/index.html#writing-to-a-database",
+    "title": "Importing Mass Layoff Statistics Data",
+    "section": "Writing to a database",
+    "text": "Writing to a database\nAs you probably noticed, some of the text files don’t have column names or headers. You can see that duckdb read the first row and assumed it was the header. In this case, we’ll have to specify column names. We can create a dictionary of known column names based on the documentation that comes with the MLS data. Note that for the srd table, there are actually five columns but only two in the documentation.\n\ntable_columns = {\n    \"dataelement\": [\"dataelement_code\", \"dataelement_text\"],\n    \"dataseries\": [\"dataseries_code\", \"dataseries_text\"],\n    \"industrybase\": [\"industrybase_code\", \"industrybase_text\"],\n    \"period\": [\"period\", \"period_abbr\", \"period_name\"],\n    \"srd\": [\"srd_code\", \"srd_text\", \"col1\", \"col2\", \"col3\"]\n}\n\nNow that we’ve created this dictionary with table names and columns, we can pass those columns into our sql statement where necessary. We’ll also modify the sql statement to create a table in our database instead of just querying the data.\nIn the DuckDB read_csv function, we can use the following parameters: - sample_size - this is helpful for determining data types. The more rows that the function can sample, the more likely that it will guess the right data types for each column - header - This is true by default. That’s great for tables that have a header and column names. For the other tables that don’t, we’ll have to set this to False. - names - When the header is set to False, we can use this to provide column names.\nWe’ll pass those parameters into the sql statement as a string.\n\nfor text_file in all_text_files:\n    print(text_file)\n\n    # create a full path for the text file\n    text_file_path = os.path.join(folder, text_file)\n\n    # generate a table name based on the file name\n    table_name = text_file.split('.')[-1]\n\n    # use the table column dictionary\n    if table_name in table_columns:\n        params = f\", header=False, names={table_columns[table_name]}\"\n    else:\n        params = \"\"\n\n    # format the sql string\n    sql = f\"\"\"\n    CREATE OR REPLACE TABLE {table_name} AS\n    SELECT\n        *\n    FROM\n        read_csv('{text_file_path}', sample_size = 100_000_000 {params})\n\n    \"\"\"\n\n    # execute the sql statement\n    query_results = quack.sql(sql)\n\nml.contacts\nml.data.0.Current\n\n\n\n\n\nml.data.1.AllData\n\n\n\n\n\nml.dataelement\nml.dataseries\nml.footnote\nml.industrybase\nml.irc\nml.period\nml.series\nml.srd\n\n\nNow the data has been loaded into the DuckDB file and is ready for some analysis."
   },
   {
     "objectID": "index.html",
@@ -39,7 +39,7 @@
     "href": "index.html#posts",
     "title": "Left Over Data",
     "section": "Posts",
-    "text": "Posts\n\n\n\n\n\n\n\n\n\n\nMass Layoff Statistic Data\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nTristan O’Malley\n\n\nFeb 14, 2025\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Posts\n\n\n\n\n\n\n\n\n\n\nMass Layoff Statistics Data\n\n\n\nLabor Statistics\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImporting Mass Layoff Statistics Data\n\n\n\nLabor Statistics\n\n\nImplementation\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\ngis\n\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html#authors",
@@ -49,17 +49,31 @@
     "text": "Authors\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "author-pages/dave-crawford/index.html",
+    "href": "author-pages/dave-crawford/index.html",
+    "title": "Dave Crawford",
+    "section": "",
+    "text": "Dave Crawford is a husband, worker, analyst, author, and traveller. In that order.\n\nAdditonal text here."
+  },
+  {
+    "objectID": "posts/mls-data/index.html",
+    "href": "posts/mls-data/index.html",
+    "title": "Mass Layoff Statistics Data",
+    "section": "",
+    "text": "The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.\nThis data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws."
+  },
+  {
     "objectID": "posts/post-with-code/index.html",
     "href": "posts/post-with-code/index.html",
     "title": "Post With Code",
     "section": "",
-    "text": "This is a post with executable code. This is some updated text.\nCode\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
-  },
-  {
-    "objectID": "posts/post-with-code/index.html#now-add-a-layer",
-    "href": "posts/post-with-code/index.html#now-add-a-layer",
-    "title": "Post With Code",
-    "section": "Now add a layer",
-    "text": "Now add a layer\nNow we will add a layer of wildfires. This is available in the ArcGIS Living Atlas\n\n\nCode\nlyr = gis.content.get('d957997ccee7408287a963600a77f61f').layers[0]\nm.content.add(lyr)"
+    "text": "This is a post with executable code.\n\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
   }
 ]
