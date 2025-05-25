@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://leftoverdata.com/posts/mls-data-import/index.html</loc>
-    <lastmod>2025-05-25T02:22:32.676Z</lastmod>
-  </url>
-  <url>
-    <loc>https://leftoverdata.com/index.html</loc>
-    <lastmod>2025-05-25T02:22:32.676Z</lastmod>
-  </url>
-  <url>
-    <loc>https://leftoverdata.com/about.html</loc>
-    <lastmod>2025-02-18T02:57:27.333Z</lastmod>
-  </url>
-  <url>
-    <loc>https://leftoverdata.com/author-pages/dave-crawford/index.html</loc>
-    <lastmod>2025-03-02T00:05:39.117Z</lastmod>
+    <loc>https://leftoverdata.com/posts/post-with-code/index.html</loc>
+    <lastmod>2025-05-25T02:22:33.035Z</lastmod>
   </url>
   <url>
     <loc>https://leftoverdata.com/posts/mls-data/index.html</loc>
     <lastmod>2025-05-25T02:22:33.023Z</lastmod>
   </url>
   <url>
-    <loc>https://leftoverdata.com/posts/post-with-code/index.html</loc>
-    <lastmod>2025-05-25T02:22:33.035Z</lastmod>
+    <loc>https://leftoverdata.com/author-pages/dave-crawford/index.html</loc>
+    <lastmod>2025-05-25T02:22:32.475Z</lastmod>
   </url>
   <url>
-    <loc>https://leftoverdata.com/posts/work-with-llm/index.html</loc>
-    <lastmod>2025-05-25T21:54:04.203Z</lastmod>
+    <loc>https://leftoverdata.com/about.html</loc>
+    <lastmod>2025-05-25T02:22:32.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leftoverdata.com/index.html</loc>
+    <lastmod>2025-05-25T02:22:32.676Z</lastmod>
+  </url>
+  <url>
+    <loc>https://leftoverdata.com/posts/mls-data-import/index.html</loc>
+    <lastmod>2025-05-25T02:22:32.676Z</lastmod>
   </url>
 </urlset>
