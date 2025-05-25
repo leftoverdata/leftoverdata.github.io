@@ -39,14 +39,14 @@
     "href": "index.html#posts",
     "title": "Left Over Data",
     "section": "Posts",
-    "text": "Posts\n\n\n\n\n\n\n\n\n\n\nMass Layoff Statistics Data\n\n\n\nLabor Statistics\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImporting Mass Layoff Statistics Data\n\n\n\nLabor Statistics\n\n\nImplementation\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\ngis\n\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Posts\n\n\n\n\n\n\n\n\n\n\nMaking an LLM Do Your Research\n\n\n\nmethodology\n\n\n\n\n\n\n\nDave Crawford\n\n\nJun 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nMass Layoff Statistics Data\n\n\n\nLabor Statistics\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nImporting Mass Layoff Statistics Data\n\n\n\nLabor Statistics\n\nImplementation\n\n\n\n\n\n\n\nDave Crawford\n\n\nMar 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\ngis\n\n\n\n\n\n\n\nDave Crawford\n\n\nFeb 27, 2025\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html#authors",
     "href": "index.html#authors",
     "title": "Left Over Data",
     "section": "Authors",
-    "text": "Authors\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Authors\n\n\n\n\n\n\n\n\nDave Crawford\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -75,5 +75,26 @@
     "title": "Post With Code",
     "section": "",
     "text": "This is a post with executable code.\n\nimport arcgis\ngis = arcgis.GIS()\nm = gis.map('San Francisco, CA')\nm"
+  },
+  {
+    "objectID": "posts/work-with-llm/index.html",
+    "href": "posts/work-with-llm/index.html",
+    "title": "Making an LLM Do Your Research",
+    "section": "",
+    "text": "I had a question for the internet. I was curious about whether the stores in Union Square in San Francisco are more high-end retail than other neighborhoods in the city. On its face, this seems like a silly question. Union Square is where the Tiffany’s, the Sak’s Fifth Ave, the Cartier, and the Bulgari (Bvlgari?) stores are. When I walk around Union Square I generally get the impression that the stores there are not for me. More about that in another post.\nSo I set out to try to quantify in some way the feeling I got. My first thought was about Google Maps’ dollar sign ratings and whether I could access those. I decided not to try too hard with that though because I don’t want to deal with API keys and paying Google. I also am aware that there are likely already metrics out there about this kind of thing, but paying for some market research firm’s output sounds way less fun than trying to generate some data myself. Plus, what’s sexier these days than working with LLMs.\nSo I started thinking about how we currently think about LLMs. There’s a lot of churn in the LLM space these days with everyone talking about agentic workflows and RAGs, but most of the documented workflows that people are using LLMs for are chatbots. What if I wanted to ask an LLM a very specific question a bunch of times? If an AI code assistant is best used as a conversational partner with the intelligence and attitude of an over-eager junior developer, maybe an LLM could function as an over-eager research intern. After all, these things were theoretically trained on the entire internet, right? They should be able to form an oppinion about how expensive they think a store seems."
+  },
+  {
+    "objectID": "posts/work-with-llm/index.html#setting-up-a-local-llm",
+    "href": "posts/work-with-llm/index.html#setting-up-a-local-llm",
+    "title": "Making an LLM Do Your Research",
+    "section": "Setting up a Local LLM",
+    "text": "Setting up a Local LLM\nI asked some colleagues who work with LLMs and surprisingly this is not the worst idea in the world, although nobody really knew of anyone using an LLM this way recently (I’m sure there is, but the internet is vast and full of garbage). Someone suggested I look into Ollama (their GitHub repo is particularly useful), which allows you to run these large language models locally. Personally, this is pretty attractive as I’m not super into the idea of sharing all my data with OpenAI nor am I into the idea of burning down a small fraction of a rain forest somewhere to do so.\nThe Ollama install is super straightforward. All you do is run their installer and then you can download individual models and interact with them through the PowerShell command line.  From there you have access to a bunch of different models you can download and work with ranging from 829 MB on the smaller end to 231 GB on the bigger end. Running a quick test confirmed my bias that the LLM is a bit over-eager and really wants to be helpful.  The first line there is me feeding a prompt to the model and the rest of it is the model’s response. It gives A LOT of explanation and context. In this case, I’m not super interested in the model’s thought process as long as it gives me a number that makes sense, and in this case it does. Concept proven(ish). Now we can try to do this over and over with Ollama’s Python API."
+  },
+  {
+    "objectID": "posts/work-with-llm/index.html#scaling-up-the-analysis",
+    "href": "posts/work-with-llm/index.html#scaling-up-the-analysis",
+    "title": "Making an LLM Do Your Research",
+    "section": "Scaling Up the Analysis",
+    "text": "Scaling Up the Analysis\nAlright, so now I have an over-eager research intern who has scoured the entire internet at some point at my disposal. The next question I have is whether it’s possible or even a good idea to repeat this analysis at the scale of thousands of stores.\nIt turns out, Ollama has a Python API that seems like it should do the job. With a quick pip install, I was off to the races.\n# pip install ollama\n\nfrom ollama import chat, ChatResponse\nNow, being the savvy developer I am, I basically just modified the hello world example from the Ollama documentation to ask my question\nresponse: ChatResponse = client.chat(model='llama3.2', messages=[\n    {\n    'role': 'user',\n    'content': f'''On a scale of 1 to 10, how expensive do you think Macy's is?''',\n    },\n])\n# print(response['message']['content'])\n# or access fields directly from the response object\nprint(response.message.content)"
   }
 ]

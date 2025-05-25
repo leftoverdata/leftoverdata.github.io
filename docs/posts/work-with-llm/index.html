@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Dave Crawford">
-<meta name="dcterms.date" content="2025-03-02">
+<meta name="dcterms.date" content="2025-06-01">
 
-<title>Mass Layoff Statistics Data – LOD</title>
+<title>Making an LLM Do Your Research – LOD</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -117,9 +152,9 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Mass Layoff Statistics Data</h1>
+      <h1 class="title">Making an LLM Do Your Research</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">Labor Statistics</div>
+                <div class="quarto-category">methodology</div>
               </div>
                   </div>
   </div>
@@ -137,7 +172,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 2, 2025</p>
+        <p class="date">June 1, 2025</p>
       </div>
     </div>
     
@@ -156,10 +191,34 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>The Bureau of Labor Statistics briefly recorded statistics on mass layoffs. This program was implemented in the early Bush administration and was discontinued in 2013 during beginning of the second Obama administration.</p>
-<p>This data is interesting largely because of the time that it covers. This ten year timespan overlaps the leadup to and recovery from the Great Recession. It also coincides with some states adopting “Right to Work” laws.</p>
+<p>I had a question for the internet. I was curious about whether the stores in Union Square in San Francisco are more high-end retail than other neighborhoods in the city. On its face, this seems like a silly question. Union Square is where the Tiffany’s, the Sak’s Fifth Ave, the Cartier, and the Bulgari (Bvlgari?) stores are. When I walk around Union Square I generally get the impression that the stores there are not <em>for me</em>. More about that in another post.</p>
+<p>So I set out to try to quantify in some way the feeling I got. My first thought was about Google Maps’ dollar sign ratings and whether I could access those. I decided not to try too hard with that though because I don’t want to deal with API keys and paying Google. I also am aware that there are likely already metrics out there about this kind of thing, but paying for some market research firm’s output sounds way less fun than trying to generate some data myself. Plus, what’s sexier these days than working with LLMs.</p>
+<p>So I started thinking about how we currently think about LLMs. There’s a lot of churn in the LLM space these days with everyone talking about agentic workflows and RAGs, but most of the documented workflows that people are using LLMs for are chatbots. What if I wanted to ask an LLM a very specific question a bunch of times? If an AI code assistant is best used as a conversational partner with the intelligence and attitude of an over-eager junior developer, maybe an LLM could function as an over-eager research intern. After all, these things were theoretically trained on the entire internet, right? They should be able to form an oppinion about how expensive they <em>think</em> a store <em>seems</em>.</p>
+<section id="setting-up-a-local-llm" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-a-local-llm">Setting up a Local LLM</h2>
+<p>I asked some colleagues who work with LLMs and surprisingly this is not the worst idea in the world, although nobody really knew of anyone using an LLM this way recently (I’m sure there is, but the internet is vast and full of garbage). Someone suggested I look into <a href="https://ollama.com/">Ollama</a> (their <a href="https://github.com/ollama/ollama">GitHub repo</a> is particularly useful), which allows you to run these large language models locally. Personally, this is pretty attractive as I’m not super into the idea of sharing all my data with OpenAI nor am I into the idea of burning down a small fraction of a rain forest somewhere to do so.</p>
+<p>The Ollama install is super straightforward. All you do is run their installer and then you can download individual models and interact with them through the PowerShell command line. <img src="ollama-setup.png" title="Ollama in PowerShell" class="img-fluid" alt="Ollama running in PowerShell"> From there you have access to a bunch of different models you can download and work with ranging from 829 MB on the smaller end to 231 GB on the bigger end. Running a quick test confirmed my bias that the LLM is a bit over-eager and really wants to be helpful. <img src="ask-about-macys.png" title="Asking Ollama about Macy's" class="img-fluid" alt="Asking Ollama about Macy’s"> The first line there is me feeding a prompt to the model and the rest of it is the model’s response. It gives A LOT of explanation and context. In this case, I’m not super interested in the model’s thought process as long as it gives me a number that makes sense, and in this case it does. Concept proven(ish). Now we can try to do this over and over with Ollama’s Python API.</p>
+</section>
+<section id="scaling-up-the-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="scaling-up-the-analysis">Scaling Up the Analysis</h2>
+<p>Alright, so now I have an over-eager research intern who has scoured the entire internet at some point at my disposal. The next question I have is whether it’s possible or even a good idea to repeat this analysis at the scale of thousands of stores.</p>
+<p>It turns out, Ollama has a <a href="https://github.com/ollama/ollama-python">Python API</a> that seems like it should do the job. With a quick pip install, I was off to the races.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pip install ollama</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ollama <span class="im">import</span> chat, ChatResponse</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now, being the savvy developer I am, I basically just modified the hello world example from the Ollama documentation to ask my question</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>response: ChatResponse <span class="op">=</span> client.chat(model<span class="op">=</span><span class="st">'llama3.2'</span>, messages<span class="op">=</span>[</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'role'</span>: <span class="st">'user'</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'content'</span>: <span class="ss">f'''On a scale of 1 to 10, how expensive do you think Macy's is?'''</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># print(response['message']['content'])</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># or access fields directly from the response object</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response.message.content)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

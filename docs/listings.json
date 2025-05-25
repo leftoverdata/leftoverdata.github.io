@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/work-with-llm/index.html",
       "/posts/mls-data/index.html",
       "/posts/mls-data-import/index.html",
       "/posts/post-with-code/index.html",
